@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface AdWatchHistoryRepository extends JpaRepository<AdWatchHistory, Integer> {
 
     @Query("SELECT COUNT(a) FROM AdWatchHistory a WHERE a.videoId = ?1")
-    long countByVideoId(int videoId);
     int countByVideoId(int videoId);
 }

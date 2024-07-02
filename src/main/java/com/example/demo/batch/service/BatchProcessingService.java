@@ -22,11 +22,6 @@ public class BatchProcessingService {
 
         for (int videoId : videoIds) {
 
-            long count = adWatchHistoryRepository.countByVideoId(videoId);
-            AdCalculate adCalculate = new AdCalculate();
-            adCalculate.setVideoId(videoId);
-            adCalculate.setAdCalculateAmount((int) count);
-
             int count = adWatchHistoryRepository.countByVideoId(videoId);
             AdCalculate adCalculate = new AdCalculate();
             adCalculate.setVideoId(videoId);
