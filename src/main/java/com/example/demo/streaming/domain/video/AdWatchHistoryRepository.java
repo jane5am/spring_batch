@@ -9,4 +9,5 @@ public interface AdWatchHistoryRepository extends JpaRepository<AdWatchHistory, 
 
     @Query("SELECT COUNT(a) FROM AdWatchHistory a WHERE a.videoId = ?1")
     long countByVideoId(int videoId);
+    int countByVideoId(int videoId);
 }
