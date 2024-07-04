@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor // 지정하는 모든 필드에 대해 생성자 만들어줌
 @NoArgsConstructor // 매개변수 없는 생성자 만들어줌
+@Table(name = "user")
 public class User {
 
     @Id

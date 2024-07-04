@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "video_watch_history")
 public class VideoWatchHistory {
 
     @Id
