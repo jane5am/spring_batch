@@ -14,5 +14,8 @@ public interface VideoWatchHistoryRepository extends JpaRepository<VideoWatchHis
     @Query("SELECT v.videoId, COUNT(v) as viewCount FROM VideoWatchHistory v WHERE v.viewDate BETWEEN :startDate AND :endDate GROUP BY v.videoId ORDER BY v.videoId ASC")
     List<Object[]> countViewsByVideoIdAndDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
+    @Query("SELECT v.videoId, SUM(v.playbackPosition) as totalPlayTime FROM VideoWatchHistory v WHERE v.viewDate BETWEEN :startDate AND :endDate GROUP BY v.videoId ORDER BY v.videoId ASC")
+    List<Object[]> findTotalPlayTimeByVideoIdAndDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
     List<VideoWatchHistory> findAll();
 }
