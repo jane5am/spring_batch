@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface VideoWatchHistoryRepository extends JpaRepository<VideoWatchHistory, Integer> {
-    @Query("SELECT v.videoId, COUNT(v) as viewCount FROM VideoWatchHistory v WHERE v.viewDate BETWEEN :startDate AND :endDate GROUP BY v.videoId ORDER BY viewCount DESC")
-    List<Object[]> findTop5VideosByViewDateBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    @Query("SELECT v.videoId, COUNT(v) as viewCount FROM VideoWatchHistory v WHERE v.viewDate BETWEEN :startDate AND :endDate GROUP BY v.videoId ORDER BY v.videoId ASC")
+    List<Object[]> countViewsByVideoIdAndDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     List<VideoWatchHistory> findAll();
 }

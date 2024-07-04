@@ -1,11 +1,9 @@
 package com.example.demo.batch.service;
 
-import com.example.demo.batch.domain.DailyViewsTop5.DailyTop5Ads;
-import com.example.demo.batch.domain.DailyViewsTop5.DailyTop5AdsRepository;
-import com.example.demo.batch.domain.DailyViewsTop5.DailyTop5Videos;
-import com.example.demo.batch.domain.DailyViewsTop5.DailyTop5VideosRepository;
 import com.example.demo.batch.domain.adcalculate.AdCalculate;
 import com.example.demo.batch.domain.adcalculate.AdCalculateRepository;
+import com.example.demo.batch.domain.dailyStatus.DailyVideoViews;
+import com.example.demo.batch.domain.dailyStatus.DailyVideoViewsRepository;
 import com.example.demo.streaming.repository.AdWatchHistoryRepository;
 import com.example.demo.streaming.repository.VideoWatchHistoryRepository;
 import org.slf4j.Logger;
@@ -19,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import static com.mysql.cj.conf.PropertyKey.logger;
 
 @Service
 public class BatchProcessingService {
@@ -36,10 +33,7 @@ public class BatchProcessingService {
     private VideoWatchHistoryRepository videoWatchHistoryRepository;
 
     @Autowired
-    private DailyTop5VideosRepository dailyTop5VideosRepository;
-
-    @Autowired
-    private DailyTop5AdsRepository dailyTop5AdsRepository;
+    private DailyVideoViewsRepository dailyVideoViewsRepository;
 
     @Transactional
     public void calculateAdWatchCounts() {
@@ -54,70 +48,42 @@ public class BatchProcessingService {
         }
     }
 
+    // 스트리밍의 모든 동영상 조회수 가져오기
     @Transactional
-    public void DailyTop5Videos() {
+    public void getVideoDailyViews() {
+
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
 
         LocalDateTime startOfDay = yesterday.atStartOfDay(); // 어제의 시작 시간 (00:00)
         LocalDateTime endOfDay = yesterday.atTime(LocalTime.MAX); // 어제의 종료 시간 (23:59:59.999999999)
 
-        List<Object[]> top5Videos = videoWatchHistoryRepository.findTop5VideosByViewDateBetween(startOfDay, endOfDay);
+        logger.info("Start of Day : " + startOfDay);
+        logger.info("End of Day : " + endOfDay);
 
-        for (int i = 0; i < Math.min(5, top5Videos.size()); i++) {
-            Object[] video = top5Videos.get(i);
-            int videoId = (int) video[0];
-            long viewCount = (long) video[1]; // PQL 쿼리에서 COUNT 함수는 기본적으로 Long 타입의 결과를 반환
+        List<Object[]> videoViews = videoWatchHistoryRepository.countViewsByVideoIdAndDateRange(startOfDay, endOfDay);
 
-            System.out.println("Video ID : " + videoId);
-            System.out.println("View Count : " + viewCount);
+        logger.info("Video Views : " + videoViews);
 
-            DailyTop5Videos dailyVideoViewsTop5 = new DailyTop5Videos();
-            dailyVideoViewsTop5.setVideoId(videoId);
-            dailyVideoViewsTop5.setViews((int) viewCount);
-            dailyVideoViewsTop5.setViewsRank(i + 1);
-            dailyVideoViewsTop5.setDate(yesterday.atStartOfDay());
+        videoViews.forEach(view -> {
+            int videoId = (int) view[0];
+            int viewCount = ((Number) view[1]).intValue(); // Casting to int
 
-            try {
-                dailyTop5VideosRepository.save(dailyVideoViewsTop5);
-            } catch (Exception e) {
-                logger.error("Error saving DailyTop5Ads for videoId: " + videoId, e);
-            }
-        }
-    }
+            logger.info("Video ID : " + videoId);
+            logger.info("View Count : " + viewCount);
 
-
-    // 광고 조회수 top5
-    @Transactional
-    public void DailyTop5Ads() {
-        LocalDate today = LocalDate.now();
-        LocalDate yesterday = today.minusDays(1);
-
-        LocalDateTime startOfDay = yesterday.atStartOfDay(); // 어제의 시작 시간 (00:00)
-        LocalDateTime endOfDay = yesterday.atTime(LocalTime.MAX); // 어제의 종료 시간 (23:59:59.999999999)
-
-        List<Object[]> top5Ads = adWatchHistoryRepository.findTop5AdsByViewDateBetween(startOfDay, endOfDay);
-
-        for (int i = 0; i < Math.min(5, top5Ads.size()); i++) {
-            Object[] ad = top5Ads.get(i);
-            int adId = (int) ad[0];
-            long viewCount = (long) ad[1]; // PQL 쿼리에서 COUNT 함수는 기본적으로 Long 타입의 결과를 반환
-
-            System.out.println("adID : " + adId);
-            System.out.println("View Count : " + viewCount);
-
-            DailyTop5Ads dailyAdsTop5 = new DailyTop5Ads();
-            dailyAdsTop5.setAdId(adId);
-            dailyAdsTop5.setViews((int) viewCount);
-            dailyAdsTop5.setViewsRank(i + 1);
-            dailyAdsTop5.setDate(yesterday.atStartOfDay());
+            DailyVideoViews dailyVideoViews = new DailyVideoViews();
+            dailyVideoViews.setVideoId(videoId);
+            dailyVideoViews.setViews(viewCount);
+            dailyVideoViews.setDate(startOfDay);
 
             try {
-                dailyTop5AdsRepository.save(dailyAdsTop5);
+                dailyVideoViewsRepository.save(dailyVideoViews);
             } catch (Exception e) {
-                logger.error("Error saving dailyAdsTop5 for adId: " + adId, e);
+                logger.error("Error saving dailyVideoViews for videoId: " + videoId, e);
+                throw e;
             }
-        }
+        });
     }
 
 }

@@ -17,17 +17,11 @@ public class AdCalculateBatchJob {
 //        batchProcessingService.calculateAdWatchCounts();
 //    }
 
-//    // 동영상 1일 조회수 Top5
-//    @Scheduled(cron = "*/5 * * * * ?")
-//    public void runDailyTop5VideosJob() {
-//        System.out.println("Batch runDailyTop5VideosJob started");
-//        batchProcessingService.DailyTop5Videos();
-//    }
-
-    // 광고 1일 조회수 Top5
+    // 동영상 daily 조회수
     @Scheduled(cron = "*/5 * * * * ?")
-    public void runDailyTop5AdsJob() {
-        System.out.println("Batch runDailyTop5AdsJob started");
-        batchProcessingService.DailyTop5Ads();
+    public void runVideoDailyViewsJob() {
+        System.out.println("Batch runVideoDailyViewsJob started");
+        batchProcessingService.getVideoDailyViews();
     }
+
 }

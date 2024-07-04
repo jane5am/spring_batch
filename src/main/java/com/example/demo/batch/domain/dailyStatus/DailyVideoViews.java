@@ -1,5 +1,6 @@
-package com.example.demo.batch.domain.DailyViewsTop5;
+package com.example.demo.batch.domain.dailyStatus;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,22 +12,21 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DailyTop5Ads {
+public class DailyVideoViews {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private int DailyTop5AdsId;
+    private int dailyVideoViewsId;
 
     @Column(nullable = false)
-    private int adId;
+    private int videoId;
 
     @Column(nullable = false)
-    private int viewsRank; //등수
+    private int views;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(nullable = false)
-    private int views; //조회수
+    private LocalDateTime date;
 
-    @Column(nullable = false)
-    private LocalDateTime date; // 날짜
 }
