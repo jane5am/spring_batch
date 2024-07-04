@@ -15,7 +15,4 @@ public interface VideoWatchHistoryRepository extends JpaRepository<VideoWatchHis
     List<Object[]> findTop5VideosByViewDateBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     List<VideoWatchHistory> findAll();
-
-    @Query("SELECT v FROM VideoWatchHistory v WHERE v.viewDate BETWEEN :startDate AND :endDate")
-    List<VideoWatchHistory> findAllByViewDateBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

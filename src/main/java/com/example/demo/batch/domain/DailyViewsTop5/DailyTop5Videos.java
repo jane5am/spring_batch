@@ -23,6 +23,9 @@ public class DailyTop5Videos {
     private int videoId;
 
     @Column(nullable = false)
+    private int viewsRank; //등수
+
+    @Column(nullable = false)
     private int views; //조회수
 
     @Column(nullable = false)
