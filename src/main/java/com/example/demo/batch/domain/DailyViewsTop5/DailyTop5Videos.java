@@ -17,7 +17,7 @@ public class DailyTop5Videos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private int dailyVideoViewsTop5Id;
+    private int DailyTop5VideosId;
 
     @Column(nullable = false)
     private int videoId;
