@@ -1,5 +1,7 @@
 package com.example.demo.batch.service;
 
+import com.example.demo.batch.domain.DailyViewsTop5.DailyTop5Ads;
+import com.example.demo.batch.domain.DailyViewsTop5.DailyTop5AdsRepository;
 import com.example.demo.batch.domain.DailyViewsTop5.DailyTop5Videos;
 import com.example.demo.batch.domain.DailyViewsTop5.DailyTop5VideosRepository;
 import com.example.demo.batch.domain.adcalculate.AdCalculate;
@@ -35,6 +37,9 @@ public class BatchProcessingService {
 
     @Autowired
     private DailyTop5VideosRepository dailyTop5VideosRepository;
+
+    @Autowired
+    private DailyTop5AdsRepository dailyTop5AdsRepository;
 
     @Transactional
     public void calculateAdWatchCounts() {
@@ -76,7 +81,41 @@ public class BatchProcessingService {
             try {
                 dailyTop5VideosRepository.save(dailyVideoViewsTop5);
             } catch (Exception e) {
-                logger.error("Error saving dailyVideoViewsTop5 for videoId: " + videoId, e);
+                logger.error("Error saving DailyTop5Ads for videoId: " + videoId, e);
+            }
+        }
+    }
+
+
+    // 광고 조회수 top5
+    @Transactional
+    public void DailyTop5Ads() {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+
+        LocalDateTime startOfDay = yesterday.atStartOfDay(); // 어제의 시작 시간 (00:00)
+        LocalDateTime endOfDay = yesterday.atTime(LocalTime.MAX); // 어제의 종료 시간 (23:59:59.999999999)
+
+        List<Object[]> top5Ads = adWatchHistoryRepository.findTop5AdsByViewDateBetween(startOfDay, endOfDay);
+
+        for (int i = 0; i < Math.min(5, top5Ads.size()); i++) {
+            Object[] ad = top5Ads.get(i);
+            int adId = (int) ad[0];
+            long viewCount = (long) ad[1]; // PQL 쿼리에서 COUNT 함수는 기본적으로 Long 타입의 결과를 반환
+
+            System.out.println("adID : " + adId);
+            System.out.println("View Count : " + viewCount);
+
+            DailyTop5Ads dailyAdsTop5 = new DailyTop5Ads();
+            dailyAdsTop5.setAdId(adId);
+            dailyAdsTop5.setViews((int) viewCount);
+            dailyAdsTop5.setViewsRank(i + 1);
+            dailyAdsTop5.setDate(yesterday.atStartOfDay());
+
+            try {
+                dailyTop5AdsRepository.save(dailyAdsTop5);
+            } catch (Exception e) {
+                logger.error("Error saving dailyAdsTop5 for adId: " + adId, e);
             }
         }
     }
