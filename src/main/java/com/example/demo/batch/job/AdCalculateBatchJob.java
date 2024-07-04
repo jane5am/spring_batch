@@ -11,9 +11,15 @@ public class AdCalculateBatchJob {
     @Autowired
     private BatchProcessingService batchProcessingService;
 
-    @Scheduled(cron = "*/300 * * * * ?")
-    public void runBatchJob() {
-        System.out.println("Batch job started");
-        batchProcessingService.calculateAdWatchCounts();
+//    @Scheduled(cron = "*/10 * * * * ?")
+//    public void runBatchJob() {
+//        System.out.println("Batch job started");
+//        batchProcessingService.calculateAdWatchCounts();
+//    }
+
+    @Scheduled(cron = "*/5 * * * * ?")
+    public void rundailyViewsTop5job() {
+        System.out.println("Batch rundailyViewsTop5job started");
+        batchProcessingService.DailyTop5Videos();
     }
 }
